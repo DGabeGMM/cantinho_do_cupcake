@@ -1,0 +1,5 @@
+{
+  "name": "Cantinho do Cupcake",
+  "description": "Um delicioso aplicativo web para vender e comprar cupcakes, com portais de login e painéis separados para vendedores e compradores.",
+  "requestFramePermissions": []
+}
