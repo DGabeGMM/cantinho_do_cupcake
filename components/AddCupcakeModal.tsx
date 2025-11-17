@@ -68,7 +68,7 @@ const AddCupcakeModal: React.FC<AddCupcakeModalProps> = ({ onClose, onAddCupcake
           <div className="flex space-x-4">
             <div className="w-1/2">
               <label htmlFor="price" className="block text-sm font-bold text-brand-text mb-1">Preço (R$)</label>
-              <input type="number" id="price" value={price} onChange={e => setPrice(parseFloat(e.target.value))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue" required min="0" step="0.01"/>
+              <input type="number" id="price" value={price} onChange={e => setPrice(parseFloat(e.target.value))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue" required min="0.01" step="0.01"/>
             </div>
             <div className="w-1/2">
               <label htmlFor="stock" className="block text-sm font-bold text-brand-text mb-1">Estoque</label>

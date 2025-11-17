@@ -24,7 +24,15 @@ const CheckoutView: React.FC<CheckoutViewProps> = ({ cart, cupcakes, onPlaceOrde
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setCustomer(prev => ({ ...prev, [id]: value }));
+
+    if (id === 'zip') {
+      const cleanedValue = value.replace(/\D/g, '');
+      const truncatedValue = cleanedValue.substring(0, 8);
+      const formattedValue = truncatedValue.replace(/(\d{5})(\d)/, '$1-$2');
+      setCustomer(prev => ({ ...prev, zip: formattedValue }));
+    } else {
+      setCustomer(prev => ({ ...prev, [id]: value }));
+    }
   };
 
   const cartWithDetails = cart.map(item => ({
@@ -82,7 +90,7 @@ const CheckoutView: React.FC<CheckoutViewProps> = ({ cart, cupcakes, onPlaceOrde
                         </div>
                         <div>
                             <label htmlFor="zip" className="block text-sm font-bold text-brand-text mb-1">CEP</label>
-                            <input type="text" id="zip" value={customer.zip} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue" required/>
+                            <input type="text" id="zip" value={customer.zip} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue" required maxLength={9} placeholder="00000-000"/>
                         </div>
                     </div>
                 </div>

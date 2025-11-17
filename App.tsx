@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { UserRole, Cupcake, CartItem, Order, CustomerDetails } from './types';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { UserRole, Cupcake, CartItem, Order, CustomerDetails, OrderItem } from './types';
 import LoginPage from './components/LoginPage';
 import BuyerDashboard from './components/BuyerDashboard';
 import SellerDashboard from './components/SellerDashboard';
@@ -18,17 +18,54 @@ const initialCupcakes: Cupcake[] = [
   { id: 6, name: 'Caramelo Swirl', description: 'Recheio de caramelo rico com uma cobertura de caramelo salgado.', price: 9.00, imageUrl: 'https://picsum.photos/id/431/400/300', stock: 10 },
 ];
 
+// --- LocalStorage Persistence Helpers ---
+const loadFromStorage = <T,>(key: string): T | null => {
+  try {
+    const storedValue = localStorage.getItem(key);
+    if (storedValue) {
+      const parsed = JSON.parse(storedValue);
+      // Special handling for orders to revive Date objects from strings
+      if (key === 'orders') {
+        return (parsed as Order[]).map(order => ({ ...order, date: new Date(order.date) })) as T;
+      }
+      return parsed as T;
+    }
+  } catch (error) {
+    console.error(`Error reading from localStorage for key "${key}":`, error);
+  }
+  return null;
+};
+
+const saveToStorage = <T,>(key: string, value: T) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.error(`Error writing to localStorage for key "${key}":`, error);
+  }
+};
+
 
 const App: React.FC = () => {
   const [userRole, setUserRole] = useState<UserRole>(null);
-  const [cupcakes, setCupcakes] = useState<Cupcake[]>(initialCupcakes);
+  const [cupcakes, setCupcakes] = useState<Cupcake[]>(() => loadFromStorage<Cupcake[]>('cupcakes') || initialCupcakes);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [buyerPage, setBuyerPage] = useState<'dashboard' | 'cart' | 'checkout' | 'confirmation'>('dashboard');
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>(() => loadFromStorage<Order[]>('orders') || []);
+
+  // --- useEffects for Data Persistence ---
+  useEffect(() => {
+    saveToStorage('cupcakes', cupcakes);
+  }, [cupcakes]);
+
+  useEffect(() => {
+    saveToStorage('orders', orders);
+  }, [orders]);
+
 
   const handleLogin = useCallback((role: 'buyer' | 'seller', credentials?: { user: string; pass: string }) => {
     if (role === 'seller') {
-      // Simple credential check for demo purposes
+      // NOTE: This is an insecure, client-side check for demonstration purposes only.
+      // In a real application, authentication must be handled by a secure backend server.
       if (credentials?.user === 'seller' && credentials?.pass === 'password') {
         setUserRole('seller');
       } else {
@@ -45,7 +82,6 @@ const App: React.FC = () => {
     setUserRole(null);
     setBuyerPage('dashboard');
     setCart([]);
-    // Orders are now persisted across sessions for this demo
   }, []);
 
   const handleAddToCart = useCallback((cupcake: Cupcake) => {
@@ -75,7 +111,6 @@ const App: React.FC = () => {
     if (!cupcake) return;
 
     if (newQuantity > cupcake.stock) {
-        // This is handled visually in CartView, but kept as a safeguard
         return;
     }
 
@@ -123,16 +158,27 @@ const App: React.FC = () => {
   }, []);
   
   const handlePlaceOrder = useCallback((customerDetails: CustomerDetails, paymentMethod: 'card' | 'cash', total: number) => {
+    // Create order items with a "snapshot" of the cupcake's name and price at the time of purchase
+    const orderItems: OrderItem[] = cart.map(cartItem => {
+      const cupcake = cupcakes.find(c => c.id === cartItem.cupcakeId);
+      return {
+        cupcakeId: cartItem.cupcakeId,
+        quantity: cartItem.quantity,
+        name: cupcake?.name || 'Cupcake Desconhecido', // Fallback in case cupcake was deleted during checkout
+        price: cupcake?.price || 0, // Fallback
+      };
+    });
+    
     const newOrder: Order = {
         id: Date.now(),
         customer: customerDetails,
-        items: cart,
+        items: orderItems,
         total,
         date: new Date(),
         paymentMethod,
     };
     
-    setOrders(prevOrders => [...prevOrders, newOrder]);
+    setOrders(prevOrders => [newOrder, ...prevOrders]);
 
     // Decrease stock
     setCupcakes(prevCupcakes => {
@@ -151,7 +197,7 @@ const App: React.FC = () => {
 
     setCart([]);
     setBuyerPage('confirmation');
-  }, [cart]);
+  }, [cart, cupcakes]);
 
   const cartItemCount = useMemo(() => {
     return cart.reduce((sum, item) => sum + item.quantity, 0);

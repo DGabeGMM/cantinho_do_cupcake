@@ -80,7 +80,8 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({ cupcakes, orders, onA
       {activeTab === 'orders' && (
         <div>
            <h2 className="text-4xl font-display text-brand-secondary mb-8">Pedidos dos Clientes</h2>
-           <SellerOrdersView orders={orders} cupcakes={cupcakes} />
+           {/* FIX: Removed the 'cupcakes' prop as it is not defined in SellerOrdersViewProps. */}
+           <SellerOrdersView orders={orders} />
         </div>
       )}
 

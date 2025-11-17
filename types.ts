@@ -14,6 +14,13 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface OrderItem {
+  cupcakeId: number;
+  quantity: number;
+  name: string;
+  price: number;
+}
+
 export interface CustomerDetails {
   name: string;
   email: string;
@@ -25,7 +32,7 @@ export interface CustomerDetails {
 export interface Order {
   id: number;
   customer: CustomerDetails;
-  items: CartItem[];
+  items: OrderItem[];
   total: number;
   date: Date;
   paymentMethod: 'card' | 'cash';

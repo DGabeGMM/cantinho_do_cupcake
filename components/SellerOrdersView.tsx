@@ -1,13 +1,11 @@
 import React from 'react';
-import { Order, Cupcake } from '../types';
+import { Order } from '../types';
 
 interface SellerOrdersViewProps {
   orders: Order[];
-  cupcakes: Cupcake[];
 }
 
-const SellerOrdersView: React.FC<SellerOrdersViewProps> = ({ orders, cupcakes }) => {
-  const getCupcakeDetails = (id: number): Cupcake | undefined => cupcakes.find(c => c.id === id);
+const SellerOrdersView: React.FC<SellerOrdersViewProps> = ({ orders }) => {
 
   if (orders.length === 0) {
     return (
@@ -23,7 +21,7 @@ const SellerOrdersView: React.FC<SellerOrdersViewProps> = ({ orders, cupcakes })
 
   return (
     <div className="space-y-6">
-      {orders.sort((a, b) => b.date.getTime() - a.date.getTime()).map(order => (
+      {orders.map(order => (
         <div key={order.id} className="bg-white rounded-2xl shadow-lg p-6 transition-shadow hover:shadow-xl">
           <div className="flex flex-col sm:flex-row justify-between items-start mb-4 border-b pb-4 gap-4">
             <div>
@@ -40,13 +38,12 @@ const SellerOrdersView: React.FC<SellerOrdersViewProps> = ({ orders, cupcakes })
           <div className="space-y-2 mb-4">
             <h4 className="font-bold text-brand-text">Itens:</h4>
             {order.items.map(item => {
-              const details = getCupcakeDetails(item.cupcakeId);
               return (
-                <div key={item.cupcakeId} className="flex justify-between items-center text-sm pl-2">
+                <div key={`${order.id}-${item.cupcakeId}`} className="flex justify-between items-center text-sm pl-2">
                   <p className="text-brand-text">
-                    <span className="font-semibold">{item.quantity}x</span> {details?.name || 'Cupcake Desconhecido'}
+                    <span className="font-semibold">{item.quantity}x</span> {item.name}
                   </p>
-                  <p className="text-gray-600">R${(details ? details.price * item.quantity : 0).toFixed(2).replace('.', ',')}</p>
+                  <p className="text-gray-600">R${(item.price * item.quantity).toFixed(2).replace('.', ',')}</p>
                 </div>
               );
             })}
