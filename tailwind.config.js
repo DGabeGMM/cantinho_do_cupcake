@@ -2,7 +2,8 @@
 export default {
   content: [
     "./index.html",
-    "./**/*.{js,ts,jsx,tsx}",
+    "./*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -17,7 +18,7 @@ export default {
         'brand-secondary': '#fb6f92',
       },
       fontFamily: {
-        'sans': ['"Comic Sans MS"', 'cursive', 'sans-serif'],
+        'sans': ['"Comic Neue"', 'cursive', 'sans-serif'],
         'display': ['"Fredoka One"', 'cursive'],
       },
     },
