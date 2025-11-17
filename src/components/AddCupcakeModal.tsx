@@ -51,9 +51,7 @@ const AddCupcakeModal: React.FC<AddCupcakeModalProps> = ({ onClose, onAddCupcake
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative transform transition-all duration-300 scale-95 animate-modal-in">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <span className="font-bold text-2xl">X</span>
         </button>
         <h2 className="text-3xl font-display text-brand-secondary mb-6">{isEditMode ? 'Editar Cupcake' : 'Adicionar um Novo Cupcake'}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
